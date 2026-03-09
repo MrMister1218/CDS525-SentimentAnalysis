@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(conda activate py310)",
+      "Bash(source /c/Users/Dylan/miniconda3/etc/profile.d/conda.sh)",
+      "Bash(source ~/anaconda3/etc/profile.d/conda.sh)",
+      "Bash(source ~/miniconda3/etc/profile.d/conda.sh)",
+      "Bash(where conda)",
+      "Read(//c/Users/Dylan/miniconda3/bin/**)",
+      "Read(//c/Users/Dylan/anaconda3/bin/**)"
+    ]
+  }
+}

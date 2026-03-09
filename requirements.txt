@@ -1,0 +1,7 @@
+# Deep Learning Dependencies
+torch
+transformers
+pandas
+scikit-learn
+matplotlib
+jupyter
