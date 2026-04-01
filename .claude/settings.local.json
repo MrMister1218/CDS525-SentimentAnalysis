@@ -7,7 +7,15 @@
       "Bash(source ~/miniconda3/etc/profile.d/conda.sh)",
       "Bash(where conda)",
       "Read(//c/Users/Dylan/miniconda3/bin/**)",
-      "Read(//c/Users/Dylan/anaconda3/bin/**)"
+      "Read(//c/Users/Dylan/anaconda3/bin/**)",
+      "Bash(python -c ':*)",
+      "Bash(KMP_DUPLICATE_LIB_OK=TRUE python scripts/preprocess.py)",
+      "Bash(python scripts/plot_results.py --separate)",
+      "Bash(rm -rf scripts/__pycache__)",
+      "Bash(python scripts/plot_results.py)",
+      "Bash(python -c \"import torch; print\\('CUDA available:', torch.cuda.is_available\\(\\)\\); print\\('GPU:', torch.cuda.get_device_name\\(0\\) if torch.cuda.is_available\\(\\) else 'N/A'\\)\")",
+      "Bash(KMP_DUPLICATE_LIB_OK=TRUE python -c \"import torch; print\\('CUDA available:', torch.cuda.is_available\\(\\)\\); print\\('GPU:', torch.cuda.get_device_name\\(0\\) if torch.cuda.is_available\\(\\) else 'N/A'\\)\")",
+      "Bash(python -c \"import torch; print\\('torch version:', torch.__version__\\); print\\('cuda version in torch:', torch.version.cuda\\)\")"
     ]
   }
 }

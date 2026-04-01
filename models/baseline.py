@@ -1,6 +1,6 @@
 """
-基于 Bi-LSTM + Attention 的情感分类模型
-用于金融文本 sentiment analysis
+BiLSTM + Attention 模型
+用于金融文本情感分类
 """
 
 import torch
@@ -9,125 +9,102 @@ import torch.nn.functional as F
 
 
 class Attention(nn.Module):
-    """
-    注意力机制模块
-    用于计算上下文向量，对序列中不同位置赋予不同权重
-    """
+    """单层注意力机制"""
     def __init__(self, hidden_dim):
         super(Attention, self).__init__()
-        # 注意力权重矩阵: 将隐藏状态映射到注意力分数
-        self.attention = nn.Linear(hidden_dim, 1)
+        self.attention = nn.Linear(hidden_dim, 1, bias=False)
 
     def forward(self, lstm_output):
         """
         Args:
-            lstm_output: Bi-LSTM 的输出，shape 为 (batch_size, seq_len, hidden_dim)
+            lstm_output: (batch_size, seq_len, hidden_dim)
         Returns:
-            context_vector: 加权后的上下文向量，shape 为 (batch_size, hidden_dim)
-            attention_weights: 注意力权重，shape 为 (batch_size, seq_len)
+            context_vector: (batch_size, hidden_dim)
+            attention_weights: (batch_size, seq_len)
         """
-        # 计算注意力分数 (batch_size, seq_len, 1)
-        attention_scores = self.attention(lstm_output)
-
-        # 对最后一个维度进行 softmax，得到注意力权重
-        attention_weights = F.softmax(attention_scores, dim=1)
-
-        # 加权求和得到上下文向量
-        context_vector = torch.sum(attention_weights * lstm_output, dim=1)
-
-        return context_vector, attention_weights
+        scores = self.attention(lstm_output)          # (batch, seq, 1)
+        weights = F.softmax(scores, dim=1)           # (batch, seq, 1)
+        context = torch.sum(weights * lstm_output, dim=1)  # (batch, hidden)
+        return context, weights.squeeze(-1)
 
 
 class BiLSTMAttention(nn.Module):
     """
-    Bi-LSTM + Attention 模型
-    用于金融文本情感分类
+    BiLSTM + Attention 文本分类模型
+    Embedding -> Bi-LSTM -> Attention -> FC -> logits
     """
-    def __init__(self, vocab_size, embedding_dim, hidden_dim, num_classes, dropout=0.3):
+    def __init__(
+        self,
+        vocab_size,
+        embedding_dim=128,
+        hidden_dim=128,
+        num_layers=2,
+        num_classes=3,
+        dropout=0.3,
+        pretrained_embeddings=None,
+        freeze_embeddings=False,
+    ):
         """
-        初始化模型参数
-
         Args:
             vocab_size: 词汇表大小
             embedding_dim: 词嵌入维度
-            hidden_dim: LSTM 隐藏层维度
-            num_classes: 分类类别数 (二分类: 2, 三分类: 3)
-            dropout: Dropout 比率，防止过拟合
+            hidden_dim: LSTM 单向隐藏层维度
+            num_layers: LSTM 层数
+            num_classes: 分类类别数
+            dropout: Dropout 比率
+            pretrained_embeddings: 预训练词向量矩阵 (vocab_size, embedding_dim)
+            freeze_embeddings: 是否冻结 Embedding 层
         """
         super(BiLSTMAttention, self).__init__()
 
-        # 词嵌入层：将词索引转换为词向量
         self.embedding = nn.Embedding(vocab_size, embedding_dim, padding_idx=0)
+        if pretrained_embeddings is not None:
+            self.embedding.weight.data.copy_(pretrained_embeddings)
+        if freeze_embeddings:
+            self.embedding.weight.requires_grad = False
 
-        # 双向 LSTM 层
-        # batch_first=True 表示输入输出的第一个维度是 batch_size
         self.lstm = nn.LSTM(
             embedding_dim,
             hidden_dim,
-            num_layers=2,           # 双层 LSTM
-            bidirectional=True,    # 双向 LSTM
+            num_layers=num_layers,
+            bidirectional=True,
             batch_first=True,
-            dropout=dropout
+            dropout=dropout if num_layers > 1 else 0,
         )
 
-        # 注意力机制层
-        # 注意：由于是双向 LSTM，hidden_dim 需要乘以 2
         self.attention = Attention(hidden_dim * 2)
 
-        # 全连接层
-        self.fc = nn.Sequential(
+        self.classifier = nn.Sequential(
             nn.Linear(hidden_dim * 2, hidden_dim),
-            nn.ReLU(),
+            nn.Tanh(),
             nn.Dropout(dropout),
-            nn.Linear(hidden_dim, num_classes)
+            nn.Linear(hidden_dim, num_classes),
         )
 
-    def forward(self, x):
+    def forward(self, input_ids, attention_mask=None):
         """
-        前向传播
-
         Args:
-            x: 输入文本，shape 为 (batch_size, seq_len)
-               其中 seq_len 是序列长度
-
+            input_ids: (batch_size, seq_len)
+            attention_mask: 忽略（仅接口兼容 FinBERT）
         Returns:
-            logits: 分类 logits，shape 为 (batch_size, num_classes)
+            logits: (batch_size, num_classes)
         """
-        # 1. 词嵌入 (batch_size, seq_len) -> (batch_size, seq_len, embedding_dim)
-        embedded = self.embedding(x)
-
-        # 2. Bi-LSTM 编码 (batch_size, seq_len, embedding_dim) -> (batch_size, seq_len, hidden_dim*2)
-        lstm_output, _ = self.lstm(embedded)
-
-        # 3. 注意力机制 (batch_size, seq_len, hidden_dim*2) -> (batch_size, hidden_dim*2)
-        context_vector, attention_weights = self.attention(lstm_output)
-
-        # 4. 全连接层分类 (batch_size, hidden_dim*2) -> (batch_size, num_classes)
-        logits = self.fc(context_vector)
-
+        embedded = self.embedding(input_ids)      # (batch, seq, emb)
+        lstm_out, _ = self.lstm(embedded)          # (batch, seq, hidden*2)
+        context, weights = self.attention(lstm_out)  # (batch, hidden*2)
+        logits = self.classifier(context)          # (batch, num_classes)
         return logits
 
 
-def create_model(config):
-    """
-    创建 Bi-LSTM + Attention 模型的工厂函数
-
-    Args:
-        config: 包含模型配置的字典
-            - vocab_size: 词汇表大小
-            - embedding_dim: 词嵌入维度
-            - hidden_dim: LSTM 隐藏层维度
-            - num_classes: 分类类别数
-            - dropout: Dropout 比率
-
-    Returns:
-        model: 初始化后的模型
-    """
-    model = BiLSTMAttention(
-        vocab_size=config.get('vocab_size', 50000),
+def create_bilstm_model(config):
+    """BiLSTM_Attention 工厂函数"""
+    return BiLSTMAttention(
+        vocab_size=config['vocab_size'],
         embedding_dim=config.get('embedding_dim', 128),
         hidden_dim=config.get('hidden_dim', 128),
-        num_classes=config.get('num_classes', 2),
-        dropout=config.get('dropout', 0.3)
+        num_layers=config.get('num_layers', 2),
+        num_classes=config.get('num_classes', 3),
+        dropout=config.get('dropout', 0.3),
+        pretrained_embeddings=config.get('pretrained_embeddings'),
+        freeze_embeddings=config.get('freeze_embeddings', False),
     )
-    return model
