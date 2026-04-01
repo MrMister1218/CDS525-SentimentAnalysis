@@ -15,7 +15,15 @@
       "Bash(python scripts/plot_results.py)",
       "Bash(python -c \"import torch; print\\('CUDA available:', torch.cuda.is_available\\(\\)\\); print\\('GPU:', torch.cuda.get_device_name\\(0\\) if torch.cuda.is_available\\(\\) else 'N/A'\\)\")",
       "Bash(KMP_DUPLICATE_LIB_OK=TRUE python -c \"import torch; print\\('CUDA available:', torch.cuda.is_available\\(\\)\\); print\\('GPU:', torch.cuda.get_device_name\\(0\\) if torch.cuda.is_available\\(\\) else 'N/A'\\)\")",
-      "Bash(python -c \"import torch; print\\('torch version:', torch.__version__\\); print\\('cuda version in torch:', torch.version.cuda\\)\")"
+      "Bash(python -c \"import torch; print\\('torch version:', torch.__version__\\); print\\('cuda version in torch:', torch.version.cuda\\)\")",
+      "Bash(du -sh results/*)",
+      "Bash(find results/ -type f -exec ls -lh {} \\\\;)",
+      "Bash(sort -k5 -h)",
+      "Bash(rm -f results/**/*.pt)",
+      "Bash(rm -f results/**/*.png)",
+      "Bash(rm -f results/**/*.pdf)",
+      "Bash(rm -f results/**/*.html)",
+      "Bash(rm -rf results/bilstm_lr_* results/finbert_lr_*)"
     ]
   }
 }
