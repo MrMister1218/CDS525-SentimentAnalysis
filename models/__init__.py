@@ -13,8 +13,10 @@ from .finbert_model import (
 )
 
 __all__ = [
+    # BiLSTM
     'BiLSTMAttention',
     'create_bilstm_model',
+    # FinBERT
     'FinBERTClassifier',
     'FinBERTTokenizer',
     'create_finbert_model',
