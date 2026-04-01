@@ -34,3 +34,13 @@ env/
 
 # Jupyter
 .ipynb_checkpoints/
+
+# Training results
+# Keep: experiment_summary.json, training_metrics.csv, prediction_comparison.csv
+results/**/*.pt
+results/**/*.png
+results/**/*.pdf
+results/**/*.html
+results/bilstm_lr_*
+results/finbert_lr_*
+results/experiment_summary.csv
