@@ -16,7 +16,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # 导入模型
-from models.baseline import BiLSTMAttention, create_model as create_bilstm_model
+from models.baseline import BiLSTMAttention, create_bilstm_model
 from models.finbert_model import FinBERTClassifier, FinBERTTokenizer, create_finbert_model
 
 
@@ -477,7 +477,7 @@ def parse_args():
                         help='Dropout 比率')
 
     # FinBERT 模型参数
-    parser.add_argument('--pretrained_model', type=str, default='ProsusAI/finbert',
+    parser.add_argument('--pretrained_model', type=str, default='yiyanghkust/finbert-tone',
                         help='预训练模型名称')
     parser.add_argument('--freeze_bert', action='store_true',
                         help='是否冻结 BERT 基础模型参数')
