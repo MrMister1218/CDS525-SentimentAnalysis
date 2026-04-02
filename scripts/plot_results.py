@@ -186,8 +186,11 @@ def plot_combined_curves(experiments, output_dir):
     """
     _setup_matplotlib()
 
-    bilstm = [e for e in experiments if 'baseline' in e['model'].lower()]
-    finbert = [e for e in experiments if 'bert' in e['model'].lower()]
+    bilstm = [e for e in experiments
+              if 'baseline' in e['model'].lower()
+              or 'bilstm' in e['model'].lower()
+              or 'bilstm' in e['name'].lower()]
+    finbert = [e for e in experiments if 'bert' in e['model'].lower() or 'bert' in e['name'].lower()]
 
     fig, axes = plt.subplots(2, 3, figsize=(18, 10))
     fig.suptitle('Training & Validation Curves', fontsize=16, fontweight='bold', y=1.01)
@@ -244,8 +247,11 @@ def plot_separate_figures(experiments, output_dir):
     """绘制 6 张独立图片"""
     _setup_matplotlib()
 
-    bilstm  = [e for e in experiments if 'baseline' in e['model'].lower()]
-    finbert = [e for e in experiments if 'bert' in e['model'].lower()]
+    bilstm  = [e for e in experiments
+               if 'baseline' in e['model'].lower()
+               or 'bilstm' in e['model'].lower()
+               or 'bilstm' in e['name'].lower()]
+    finbert = [e for e in experiments if 'bert' in e['model'].lower() or 'bert' in e['name'].lower()]
 
     configs = [
         ('fig01_bilstm_loss.png',    bilstm,           'train_loss', 'val_loss',  'Loss',     'BiLSTM — Training & Validation Loss',     True),

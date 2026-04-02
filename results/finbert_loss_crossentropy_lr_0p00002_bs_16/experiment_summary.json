@@ -1,0 +1,14 @@
+{
+  "model": "FinBERT",
+  "loss_fn": "CrossEntropyLoss",
+  "lr": 2e-05,
+  "batch_size": 16,
+  "epochs": 10,
+  "best_val_acc": 0.8351,
+  "test_acc": 0.8784,
+  "test_loss": 0.7851,
+  "train_final_loss": 0.0228,
+  "train_final_acc": 0.9941,
+  "val_final_loss": 0.9633,
+  "val_final_acc": 0.8227
+}
