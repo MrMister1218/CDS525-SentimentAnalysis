@@ -9,8 +9,7 @@
 ```
 CDS525-SentimentAnalysis/
 ├── data/
-│   ├── all-data.csv          # 训练数据（4846条金融新闻，已标注）
-│   └── train.csv             # 旧版示例数据（可忽略）
+│   └── all-data.csv          # 训练数据（4846条金融新闻，已标注）
 ├── models/
 │   ├── __init__.py           # 模型导出文件（勿动）
 │   ├── baseline.py           # BiLSTM + Attention 模型代码

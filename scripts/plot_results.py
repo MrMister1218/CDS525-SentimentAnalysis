@@ -561,8 +561,10 @@ def main():
                         help='输出目录（默认同 results_dir）')
     parser.add_argument('--n_rows', type=int, default=100,
                         help='HTML 表格展示行数（默认 100）')
+    # always separate; combined view removed
+    # (kept for backwards compat — no-op)
     parser.add_argument('--separate', action='store_true',
-                        help='同时生成 6 张独立图片')
+                        help='[deprecated, now always on] 同时生成 6 张独立图片')
     args = parser.parse_args()
 
     results_dir = os.path.abspath(args.results_dir)
@@ -582,14 +584,8 @@ def main():
         print(f'  - {e["name"]}  model={e["model"]}  loss={e["loss_fn"]}  '
               f'lr={_fmt_lr(e["lr"])}  bs={e["bs"]}')
 
-    print('\n[1/4] Drawing 6-in-1 combined curves...')
-    plot_combined_curves(experiments, output_dir)
-
-    if args.separate:
-        print('\n[2/4] Drawing separate figures...')
-        plot_separate_figures(experiments, output_dir)
-    else:
-        print('\n[2/4] Skipped (use --separate to enable)')
+    print('\n[1/4] Drawing separate figures...')
+    plot_separate_figures(experiments, output_dir)
 
     print('\n[3/4] Generating HTML prediction tables...')
     generate_html_tables(experiments, output_dir, n_rows=args.n_rows)

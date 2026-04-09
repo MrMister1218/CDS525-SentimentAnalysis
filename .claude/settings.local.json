@@ -23,7 +23,11 @@
       "Bash(rm -f results/**/*.png)",
       "Bash(rm -f results/**/*.pdf)",
       "Bash(rm -f results/**/*.html)",
-      "Bash(rm -rf results/bilstm_lr_* results/finbert_lr_*)"
+      "Bash(rm -rf results/bilstm_lr_* results/finbert_lr_*)",
+      "Bash(python generate_report.py)",
+      "Bash(python generate_report_en.py)",
+      "Bash(ls -lh \"d:/projects/作业/Practical App of Deep Learning/CDS525-SentimentAnalysis/\"*.docx)",
+      "Bash(python generate_report_academic.py)"
     ]
   }
 }
