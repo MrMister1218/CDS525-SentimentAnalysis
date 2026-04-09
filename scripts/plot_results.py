@@ -254,16 +254,16 @@ def plot_separate_figures(experiments, output_dir):
     finbert = [e for e in experiments if 'bert' in e['model'].lower() or 'bert' in e['name'].lower()]
 
     configs = [
-        ('fig01_bilstm_loss.png',    bilstm,           'train_loss', 'val_loss',  'Loss',     'BiLSTM — Training & Validation Loss',     True),
-        ('fig02_finbert_loss.png',   finbert,          'train_loss', 'val_loss',  'Loss',     'FinBERT — Training & Validation Loss',   True),
-        ('fig03_loss_comparison.png', experiments,      'train_loss', 'val_loss',  'Loss',     'All Models — Validation Loss Comparison', False),
-        ('fig04_bilstm_acc.png',     bilstm,           'train_acc',  'val_acc',   'Accuracy', 'BiLSTM — Training & Validation Accuracy', True),
-        ('fig05_finbert_acc.png',    finbert,          'train_acc',  'val_acc',   'Accuracy', 'FinBERT — Training & Validation Accuracy', True),
-        ('fig06_acc_comparison.png',  experiments,      'train_acc',  'val_acc',   'Accuracy', 'All Models — Validation Accuracy Comparison', False),
+        ('fig01_bilstm_loss.png',    bilstm,           'train_loss', 'val_loss',  'Loss',     'BiLSTM — Training & Validation Loss',              True),
+        ('fig02_finbert_loss.png',   finbert,          'train_loss', 'val_loss',  'Loss',     'FinBERT — Training & Validation Loss (varying batch sizes)', True),
+        ('fig03_loss_comparison.png', experiments,      'train_loss', 'val_loss',  'Loss',     'All Models — Validation Loss Comparison',          False),
+        ('fig04_bilstm_acc.png',     bilstm,           'train_acc',  'val_acc',   'Accuracy', 'BiLSTM — Training & Validation Accuracy',          True),
+        ('fig05_finbert_acc.png',    finbert,          'train_acc',  'val_acc',   'Accuracy', 'FinBERT — Training & Validation Accuracy (varying batch sizes)', True),
+        ('fig06_acc_comparison.png',  experiments,      'train_acc',  'val_acc',   'Accuracy', 'All Models — Validation Accuracy Comparison',    False),
     ]
 
     for filename, exps, tc, vc, ylabel, title, show_train in configs:
-        fig, ax = plt.subplots(figsize=(10, 6))
+        fig, ax = plt.subplots(figsize=(10, 6.5) if show_train else (10, 6))
         _draw_loss_or_acc(ax, exps, tc, vc, ylabel, title, show_train=show_train)
         plt.tight_layout()
         out_path = os.path.join(output_dir, filename)
@@ -308,7 +308,11 @@ def _draw_loss_or_acc(ax, experiments, train_col, val_col, ylabel, title, show_t
     ax.set_title(title)
     ax.set_xlabel('Epoch')
     ax.set_ylabel(ylabel)
-    ax.legend(loc='best', framealpha=0.9, ncol=1 if show_train else 2)
+    if show_train:
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.18), ncol=2,
+                  framealpha=0.9, fontsize=8)
+    else:
+        ax.legend(loc='upper left', bbox_to_anchor=(1.02, 1.0), framealpha=0.9, fontsize=8)
     ax.set_xlim(left=1)
     ax.set_xticks(range(1, int(ax.get_xlim()[1]) + 1))
 
@@ -464,48 +468,96 @@ def generate_html_tables(experiments, output_dir, n_rows=100):
     _plot_heatmap(experiments, output_dir)
 
 
-def _plot_heatmap(experiments, output_dir):
-    """生成预测混淆矩阵热力图"""
-    _setup_matplotlib()
-    labels = ['neutral', 'positive', 'negative']
+def _build_matrix(pred_df):
+    """从预测 DataFrame 构建 3x3 混淆矩阵"""
     label_id = {'neutral': 0, 'positive': 1, 'negative': 2,
                 '0': 0, '1': 1, '2': 2, 0: 0, 1: 1, 2: 2}
+    matrix = np.zeros((3, 3), dtype=int)
+    for _, row in pred_df.iterrows():
+        t = label_id.get(row['true_label'], 0)
+        p = label_id.get(row['pred_label'], 0)
+        matrix[t, p] += 1
+    return matrix
 
-    n = len(experiments)
-    fig, axes = plt.subplots(1, max(1, n), figsize=(5 * max(1, n), 4), squeeze=False)
-    fig.suptitle('Prediction Confusion Heatmap (Test Set)', fontsize=13, fontweight='bold')
 
-    for col, exp in enumerate(experiments):
-        pred_df = exp['predictions']
-        if pred_df is None:
-            continue
+def _draw_one_heatmap(ax, matrix, title, labels):
+    """在单个 ax 上绘制一张混淆矩阵"""
+    im = ax.imshow(matrix, cmap='Blues', aspect='auto')
+    ax.set_xticks(range(3)); ax.set_xticklabels(labels, fontsize=9)
+    ax.set_yticks(range(3)); ax.set_yticklabels(labels, fontsize=9)
+    ax.set_xlabel('Predicted'); ax.set_ylabel('True Label')
+    ax.set_title(title, fontsize=10)
+    for r in range(3):
+        for c in range(3):
+            color = 'white' if matrix[r, c] > matrix.max() * 0.5 else 'black'
+            ax.text(c, r, str(matrix[r, c]), ha='center', va='center',
+                    color=color, fontsize=13, fontweight='bold')
+    plt.colorbar(im, ax=ax, shrink=0.8)
 
-        matrix = np.zeros((3, 3), dtype=int)
-        for _, row in pred_df.iterrows():
-            t = label_id.get(row['true_label'], 0)
-            p = label_id.get(row['pred_label'], 0)
-            matrix[t, p] += 1
 
-        ax = axes[0, col]
-        im = ax.imshow(matrix, cmap='Blues', aspect='auto')
-        ax.set_xticks(range(3)); ax.set_xticklabels(labels, fontsize=9)
-        ax.set_yticks(range(3)); ax.set_yticklabels(labels, fontsize=9)
-        ax.set_xlabel('Predicted'); ax.set_ylabel('True Label')
-        ax.set_title(exp['name'], fontsize=10)
+def _plot_heatmap(experiments, output_dir):
+    """生成三张混淆矩阵热力图：BiLSTM-CE / BiLSTM-LS / FinBERT"""
+    _setup_matplotlib()
+    labels = ['neutral', 'positive', 'negative']
 
-        for r in range(3):
-            for c in range(3):
-                color = 'white' if matrix[r, c] > matrix.max() * 0.5 else 'black'
-                ax.text(c, r, str(matrix[r, c]), ha='center', va='center',
-                        color=color, fontsize=12, fontweight='bold')
+    def _lr_match(lr_str, targets=(0.01, 0.001, 0.0001)):
+        try:
+            return round(float(lr_str), 5) in targets
+        except Exception:
+            return False
 
-        plt.colorbar(im, ax=ax, shrink=0.8)
+    def _is_ls(exp):
+        return 'smoothing' in exp['loss_fn'].lower()
 
+    def _is_bilstm(exp):
+        m = exp['model'].lower()
+        return 'baseline' in m or 'bilstm' in m
+
+    bilstm_ce = [e for e in experiments
+                 if _is_bilstm(e) and not _is_ls(e) and _lr_match(e['lr'])]
+    bilstm_ls = [e for e in experiments
+                 if _is_bilstm(e) and _is_ls(e) and _lr_match(e['lr'])]
+    finbert_exps = [e for e in experiments if 'bert' in e['model'].lower()]
+
+    # 图1: BiLSTM CrossEntropy
+    fig1, axes1 = plt.subplots(1, 3, figsize=(15, 4.5), squeeze=False)
+    fig1.suptitle('BiLSTM + Attention (CrossEntropy Loss) — Confusion Matrix (Test Set)', fontsize=13, fontweight='bold')
+    for i, exp in enumerate(bilstm_ce):
+        ax = axes1[0, i]
+        m = _build_matrix(exp['predictions']) if exp['predictions'] is not None else np.zeros((3,3))
+        _draw_one_heatmap(ax, m, exp['name'], labels)
     plt.tight_layout()
-    out_path = os.path.join(output_dir, 'prediction_heatmap.png')
-    fig.savefig(out_path, bbox_inches='tight', dpi=150)
+    out1 = os.path.join(output_dir, 'fig08_heatmap_bilstm_ce.png')
+    fig1.savefig(out1, bbox_inches='tight', dpi=150)
     plt.close()
-    print(f'  [Saved] {out_path}')
+    print(f'  [Saved] {out1}')
+
+    # 图2: BiLSTM Label Smoothing
+    fig2, axes2 = plt.subplots(1, 3, figsize=(15, 4.5), squeeze=False)
+    fig2.suptitle('BiLSTM + Attention (Label Smoothing Loss) — Confusion Matrix (Test Set)', fontsize=13, fontweight='bold')
+    for i, exp in enumerate(bilstm_ls):
+        ax = axes2[0, i]
+        m = _build_matrix(exp['predictions']) if exp['predictions'] is not None else np.zeros((3,3))
+        _draw_one_heatmap(ax, m, exp['name'], labels)
+    plt.tight_layout()
+    out2 = os.path.join(output_dir, 'fig09_heatmap_bilstm_ls.png')
+    fig2.savefig(out2, bbox_inches='tight', dpi=150)
+    plt.close()
+    print(f'  [Saved] {out2}')
+
+    # 图3: FinBERT
+    n_fb = len(finbert_exps)
+    fig3, axes3 = plt.subplots(1, n_fb, figsize=(6 * n_fb, 4.5), squeeze=False)
+    fig3.suptitle('FinBERT — Confusion Matrix (Test Set)', fontsize=13, fontweight='bold')
+    for i, exp in enumerate(finbert_exps):
+        ax = axes3[0, i]
+        m = _build_matrix(exp['predictions']) if exp['predictions'] is not None else np.zeros((3,3))
+        _draw_one_heatmap(ax, m, exp['name'], labels)
+    plt.tight_layout()
+    out3 = os.path.join(output_dir, 'fig10_heatmap_finbert.png')
+    fig3.savefig(out3, bbox_inches='tight', dpi=150)
+    plt.close()
+    print(f'  [Saved] {out3}')
 
 
 # ==================== 汇总报告 ====================

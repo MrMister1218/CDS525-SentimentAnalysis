@@ -473,8 +473,8 @@ def main():
     # --- 运行实验 ---
     print(f"\n=== 开始训练 | {exp_name} ===")
     summary = run_experiment(
-        model_name=model_display,
-        loss_fn_name=loss_display,
+        model_name=args.model,
+        loss_fn_name=args.loss_fn,
         lr=args.lr,
         batch_size=args.batch_size,
         train_loader=train_loader,

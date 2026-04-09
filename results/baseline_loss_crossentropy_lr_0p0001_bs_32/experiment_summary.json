@@ -1,0 +1,14 @@
+{
+  "model": "baseline",
+  "loss_fn": "crossentropy",
+  "lr": 0.0001,
+  "batch_size": 32,
+  "epochs": 10,
+  "best_val_acc": 0.7072,
+  "test_acc": 0.7196,
+  "test_loss": 0.8772,
+  "train_final_loss": 0.5063,
+  "train_final_acc": 0.8225,
+  "val_final_loss": 0.9042,
+  "val_final_acc": 0.7072
+}

@@ -1,0 +1,14 @@
+{
+  "model": "finbert",
+  "loss_fn": "crossentropy",
+  "lr": 2e-05,
+  "batch_size": 8,
+  "epochs": 10,
+  "best_val_acc": 0.8309,
+  "test_acc": 0.8536,
+  "test_loss": 0.6655,
+  "train_final_loss": 0.0193,
+  "train_final_acc": 0.9946,
+  "val_final_loss": 1.1686,
+  "val_final_acc": 0.7979
+}

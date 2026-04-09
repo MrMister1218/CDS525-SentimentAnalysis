@@ -2,3 +2,12 @@
 baseline_loss_crossentropy_lr_0p001_bs_32,BiLSTM + Attention,CrossEntropyLoss,0.001,32,2,0.5938,0.5938,1.0471,66.0
 baseline_loss_labelsmoothing_lr_0p001_bs_32,BiLSTM + Attention,Label Smoothing Loss,0.001,32,2,0.5938,0.5938,1.0471,66.0
 finbert_loss_crossentropy_lr_0p00002_bs_16,FinBERT,CrossEntropyLoss,2e-05,16,3,0.8433,0.8227,0.9053,90.0
+baseline_loss_crossentropy_lr_0p0001_bs_32,baseline,crossentropy,0.0001,32,10,0.7072,0.7072,0.9042,75.0
+baseline_loss_crossentropy_lr_0p01_bs_32,baseline,crossentropy,0.01,32,7,0.732,0.732,1.8496,83.0
+baseline_loss_crossentropy_lr_0p1_bs_32,baseline,crossentropy,0.1,32,1,0.5938,0.5938,1.0993,66.0
+baseline_loss_labelsmoothing_lr_0p0001_bs_32,baseline,labelsmoothing,0.0001,32,10,0.7258,0.7258,0.8742,74.0
+baseline_loss_labelsmoothing_lr_0p01_bs_32,baseline,labelsmoothing,0.01,32,2,0.7649,0.7381,0.956,89.0
+finbert_loss_crossentropy_lr_0p00002_bs_8,finbert,crossentropy,2e-05,8,5,0.8309,0.7979,1.1686,88.0
+finbert_loss_crossentropy_lr_0p00002_bs_32,finbert,crossentropy,2e-05,32,9,0.8392,0.8309,1.0117,86.0
+finbert_loss_crossentropy_lr_0p00002_bs_64,finbert,crossentropy,2e-05,64,2,0.8309,0.8289,0.9347,89.0
+finbert_loss_crossentropy_lr_0p00002_bs_128,finbert,crossentropy,2e-05,128,8,0.8433,0.833,0.8142,90.0

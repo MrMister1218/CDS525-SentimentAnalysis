@@ -29,7 +29,8 @@
       "Bash(ls -lh \"d:/projects/作业/Practical App of Deep Learning/CDS525-SentimentAnalysis/\"*.docx)",
       "Bash(python generate_report_academic.py)",
       "Bash(ls \"d:/projects/作业/Practical App of Deep Learning/CDS525-SentimentAnalysis/\"*.py)",
-      "Bash(ls \"d:/projects/作业/Practical App of Deep Learning/CDS525-SentimentAnalysis/results/\"*.png)"
+      "Bash(ls \"d:/projects/作业/Practical App of Deep Learning/CDS525-SentimentAnalysis/results/\"*.png)",
+      "Bash(python train.py --model baseline --loss_fn labelsmoothing --lr 0.01 --batch_size 32 --epochs 10 --use_class_weight)"
     ]
   }
 }
