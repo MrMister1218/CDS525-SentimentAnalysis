@@ -56,10 +56,11 @@ Two models are implemented with a unified `forward(input_ids, attention_mask=Non
    pip install -r requirements.txt
    ```
 
-2. Preprocess data:
+2. (Optional) Preprocess data independently:
    ```bash
    python scripts/preprocess.py
    ```
+   Note: `train.py` handles data loading internally; this step is only needed to inspect the dataset structure.
 
 3. Train a model:
    ```bash

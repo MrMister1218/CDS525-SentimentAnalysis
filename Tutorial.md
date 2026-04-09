@@ -74,18 +74,18 @@ PyTorch 2.x.x, CUDA: False  # 仅CPU可用（可训练，速度较慢）
 
 **BiLSTM + CrossEntropyLoss（默认）**
 ```bash
-python train.py --model baseline --loss_fn crossentropy --lr 0.001 --batch_size 32 --epochs 10
+python train.py --model baseline --loss_fn crossentropy --lr 0.01 --batch_size 32 --epochs 10
 ```
 
 **BiLSTM + Label Smoothing（带标签平滑）**
 ```bash
-python train.py --model baseline --loss_fn labelsmoothing --lr 0.001 --batch_size 32 --epochs 10
+python train.py --model baseline --loss_fn labelsmoothing --lr 0.01 --batch_size 32 --epochs 10
 ```
 
 ### 3.2 训练 FinBERT 模型
 
 ```bash
-python train.py --model finbert --loss_fn crossentropy --lr 2e-5 --batch_size 16 --epochs 5
+python train.py --model finbert --loss_fn crossentropy --lr 2e-5 --batch_size 16 --epochs 10
 ```
 
 > FinBERT 首次运行会从 HuggingFace 下载预训练权重（约 400MB），请耐心等待。
@@ -106,10 +106,10 @@ python train.py --model finbert --loss_fn crossentropy --lr 2e-5 --batch_size 16
 
 ```bash
 # 实验1：BiLSTM + CrossEntropy + 高学习率
-python train.py --model baseline --loss_fn crossentropy --lr 0.001 --batch_size 32 --use_class_weight
+python train.py --model baseline --loss_fn crossentropy --lr 0.01 --batch_size 32 --use_class_weight
 
 # 实验2：BiLSTM + Label Smoothing + 低学习率
-python train.py --model baseline --loss_fn labelsmoothing --lr 0.001 --batch_size 32 --use_class_weight
+python train.py --model baseline --loss_fn labelsmoothing --lr 0.01 --batch_size 32 --use_class_weight
 
 # 实验3：FinBERT + 低学习率
 python train.py --model finbert --loss_fn crossentropy --lr 2e-5 --batch_size 16 --use_class_weight
@@ -256,17 +256,17 @@ python scripts/plot_results.py --results_dir results --output_dir results
 
 ### Step 1: 训练 BiLSTM + CrossEntropy
 ```bash
-python train.py --model baseline --loss_fn crossentropy --lr 0.001 --batch_size 32 --epochs 10
+python train.py --model baseline --loss_fn crossentropy --lr 0.01 --batch_size 32 --epochs 10
 ```
 
 ### Step 2: 训练 BiLSTM + Label Smoothing
 ```bash
-python train.py --model baseline --loss_fn labelsmoothing --lr 0.001 --batch_size 32 --epochs 10
+python train.py --model baseline --loss_fn labelsmoothing --lr 0.01 --batch_size 32 --epochs 10
 ```
 
 ### Step 3: 训练 FinBERT
 ```bash
-python train.py --model finbert --loss_fn crossentropy --lr 2e-5 --batch_size 16 --epochs 5
+python train.py --model finbert --loss_fn crossentropy --lr 2e-5 --batch_size 16 --epochs 10
 ```
 
 ### Step 4: 生成可视化

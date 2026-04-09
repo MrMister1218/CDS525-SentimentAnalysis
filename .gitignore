@@ -44,6 +44,9 @@ beautify_report.py
 # Generated Word documents
 *.docx
 
+# Generated PDFs
+*.pdf
+
 # Training results
 # Keep: experiment_summary.json, training_metrics.csv, prediction_comparison.csv
 results/**/*.pt
