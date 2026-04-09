@@ -106,13 +106,15 @@ python train.py --model finbert --loss_fn crossentropy --lr 2e-5 --batch_size 16
 
 ```bash
 # 实验1：BiLSTM + CrossEntropy + 高学习率
-python train.py --model baseline --loss_fn crossentropy --lr 0.001 --batch_size 32 --epochs 10
+python train.py --model baseline --loss_fn crossentropy --lr 0.001 --batch_size 32 --use_class_weight
 
 # 实验2：BiLSTM + Label Smoothing + 低学习率
-python train.py --model baseline --loss_fn labelsmoothing --lr 0.0005 --batch_size 32 --epochs 10
+python train.py --model baseline --loss_fn labelsmoothing --lr 0.001 --batch_size 32 --use_class_weight
 
 # 实验3：FinBERT + 低学习率
-python train.py --model finbert --loss_fn crossentropy --lr 2e-5 --batch_size 16 --epochs 5
+python train.py --model finbert --loss_fn crossentropy --lr 2e-5 --batch_size 16 --use_class_weight
+
+
 ```
 
 ---
