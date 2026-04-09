@@ -220,6 +220,7 @@ def run_experiment(
     train_loader, val_loader, test_loader,
     num_classes, device,
     exp_dir,
+    class_weight=None,
 ):
     """
     运行一次实验，返回训练指标
@@ -235,7 +236,7 @@ def run_experiment(
     if loss_fn_name == 'labelsmoothing':
         criterion = LabelSmoothingCrossEntropy(smoothing=0.1, num_classes=num_classes)
     else:
-        criterion = nn.CrossEntropyLoss()
+        criterion = nn.CrossEntropyLoss(weight=class_weight)
 
     # --- 优化器 ---
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
@@ -349,6 +350,8 @@ def main():
                         help='冻结 BERT backbone（仅 finbert）')
     parser.add_argument('--num_classes', type=int, default=3,
                         help='分类类别数')
+    parser.add_argument('--use_class_weight', action='store_true',
+                        help='启用类别权重，缓解数据集不平衡（neutral:59.4% / positive:28.1% / negative:12.5%）')
     parser.add_argument('--seed', type=int, default=42,
                         help='随机种子')
     parser.add_argument('--output_dir', type=str, default='results',
@@ -386,6 +389,18 @@ def main():
     train_texts, val_texts, test_texts, train_labels, val_labels, test_labels, label_map = load_data(
         args.data_path, test_ratio=0.1, val_ratio=0.1, random_state=args.seed
     )
+
+    # --- 类别权重（按样本数倒数，少数类权重更高）---
+    class_weight = None
+    if args.use_class_weight:
+        from collections import Counter
+        counts = Counter(train_labels)
+        total = len(train_labels)
+        # neutral=0, positive=1, negative=2
+        # 权重 = sqrt(总样本数 / 该类样本数)，避免极端值
+        weights = [np.sqrt(total / counts[i]) for i in range(args.num_classes)]
+        class_weight = torch.tensor(weights, dtype=torch.float32).to(device)
+        print(f"[ClassWeight] {dict(enumerate(weights))}  (sqrt逆频率加权)")
 
     # --- 根据模型类型准备 DataLoader ---
     if args.model == 'baseline':
@@ -468,6 +483,7 @@ def main():
         num_classes=args.num_classes,
         device=device,
         exp_dir=exp_dir,
+        class_weight=class_weight,
     )
 
     # --- 打印最终结果 ---

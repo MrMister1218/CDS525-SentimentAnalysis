@@ -1,4 +1,4 @@
 ﻿experiment,model,loss_fn,lr,batch_size,best_epoch,best_val_acc,final_val_acc,final_val_loss,test_acc(%)
-baseline_loss_crossentropy_lr_0p001_bs_32,BiLSTM + Attention,CrossEntropyLoss,0.001,32,2,0.5938,0.5938,0.9245,66.0
-baseline_loss_labelsmoothing_lr_0p001_bs_32,BiLSTM + Attention,Label Smoothing Loss,0.001,32,2,0.5938,0.5938,0.9245,66.0
-finbert_loss_crossentropy_lr_0p00002_bs_16,FinBERT,CrossEntropyLoss,2e-05,16,3,0.8351,0.8227,0.9633,90.0
+baseline_loss_crossentropy_lr_0p001_bs_32,BiLSTM + Attention,CrossEntropyLoss,0.001,32,2,0.5938,0.5938,1.0471,66.0
+baseline_loss_labelsmoothing_lr_0p001_bs_32,BiLSTM + Attention,Label Smoothing Loss,0.001,32,2,0.5938,0.5938,1.0471,66.0
+finbert_loss_crossentropy_lr_0p00002_bs_16,FinBERT,CrossEntropyLoss,2e-05,16,3,0.8433,0.8227,0.9053,90.0

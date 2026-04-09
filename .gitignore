@@ -35,6 +35,15 @@ env/
 # Jupyter
 .ipynb_checkpoints/
 
+# Generated scripts
+generate_report.py
+generate_report_en.py
+generate_report_academic.py
+beautify_report.py
+
+# Generated Word documents
+*.docx
+
 # Training results
 # Keep: experiment_summary.json, training_metrics.csv, prediction_comparison.csv
 results/**/*.pt

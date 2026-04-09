@@ -4,11 +4,11 @@
   "lr": 2e-05,
   "batch_size": 16,
   "epochs": 10,
-  "best_val_acc": 0.8351,
+  "best_val_acc": 0.8433,
   "test_acc": 0.8784,
-  "test_loss": 0.7851,
-  "train_final_loss": 0.0228,
-  "train_final_acc": 0.9941,
-  "val_final_loss": 0.9633,
+  "test_loss": 0.4857,
+  "train_final_loss": 0.0325,
+  "train_final_acc": 0.9915,
+  "val_final_loss": 0.9053,
   "val_final_acc": 0.8227
 }

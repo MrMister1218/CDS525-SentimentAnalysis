@@ -27,7 +27,9 @@
       "Bash(python generate_report.py)",
       "Bash(python generate_report_en.py)",
       "Bash(ls -lh \"d:/projects/作业/Practical App of Deep Learning/CDS525-SentimentAnalysis/\"*.docx)",
-      "Bash(python generate_report_academic.py)"
+      "Bash(python generate_report_academic.py)",
+      "Bash(ls \"d:/projects/作业/Practical App of Deep Learning/CDS525-SentimentAnalysis/\"*.py)",
+      "Bash(ls \"d:/projects/作业/Practical App of Deep Learning/CDS525-SentimentAnalysis/results/\"*.png)"
     ]
   }
 }
