@@ -397,8 +397,9 @@ def main():
         counts = Counter(train_labels)
         total = len(train_labels)
         # neutral=0, positive=1, negative=2
-        # 权重 = sqrt(总样本数 / 该类样本数)，避免极端值
-        weights = [np.sqrt(total / counts[i]) for i in range(args.num_classes)]
+        # 权重 = sqrt(总样本数 / (类别数 × 该类样本数))，避免极端值
+        num_classes = args.num_classes  # C = 3
+        weights = [np.sqrt(total / (num_classes * counts[i])) for i in range(num_classes)]
         class_weight = torch.tensor(weights, dtype=torch.float32).to(device)
         print(f"[ClassWeight] {dict(enumerate(weights))}  (sqrt逆频率加权)")
 

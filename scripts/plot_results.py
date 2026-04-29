@@ -496,7 +496,7 @@ def _draw_one_heatmap(ax, matrix, title, labels):
 
 
 def _plot_heatmap(experiments, output_dir):
-    """生成三张混淆矩阵热力图：BiLSTM-CE / BiLSTM-LS / FinBERT"""
+    """生成三张混淆矩阵热力图：BiLSTM-CE / BiLSTM-LS (各3 LR) / FinBERT (最佳3个)"""
     _setup_matplotlib()
     labels = ['neutral', 'positive', 'negative']
 
@@ -513,13 +513,20 @@ def _plot_heatmap(experiments, output_dir):
         m = exp['model'].lower()
         return 'baseline' in m or 'bilstm' in m
 
+    def _best_exps(exps, n=3):
+        """返回 val_acc 最高的 n 个实验"""
+        if not exps:
+            return []
+        sorted_exps = sorted(exps, key=lambda e: e['metrics']['val_acc'].max() if not e['metrics'].empty else 0, reverse=True)
+        return sorted_exps[:n]
+
     bilstm_ce = [e for e in experiments
                  if _is_bilstm(e) and not _is_ls(e) and _lr_match(e['lr'])]
     bilstm_ls = [e for e in experiments
                  if _is_bilstm(e) and _is_ls(e) and _lr_match(e['lr'])]
-    finbert_exps = [e for e in experiments if 'bert' in e['model'].lower()]
+    finbert_best3 = _best_exps([e for e in experiments if 'bert' in e['model'].lower()], n=3)
 
-    # 图1: BiLSTM CrossEntropy
+    # 图1: BiLSTM CrossEntropy (3 LR)
     fig1, axes1 = plt.subplots(1, 3, figsize=(15, 4.5), squeeze=False)
     fig1.suptitle('BiLSTM + Attention (CrossEntropy Loss) — Confusion Matrix (Test Set)', fontsize=13, fontweight='bold')
     for i, exp in enumerate(bilstm_ce):
@@ -532,7 +539,7 @@ def _plot_heatmap(experiments, output_dir):
     plt.close()
     print(f'  [Saved] {out1}')
 
-    # 图2: BiLSTM Label Smoothing
+    # 图2: BiLSTM Label Smoothing (3 LR)
     fig2, axes2 = plt.subplots(1, 3, figsize=(15, 4.5), squeeze=False)
     fig2.suptitle('BiLSTM + Attention (Label Smoothing Loss) — Confusion Matrix (Test Set)', fontsize=13, fontweight='bold')
     for i, exp in enumerate(bilstm_ls):
@@ -545,11 +552,10 @@ def _plot_heatmap(experiments, output_dir):
     plt.close()
     print(f'  [Saved] {out2}')
 
-    # 图3: FinBERT
-    n_fb = len(finbert_exps)
-    fig3, axes3 = plt.subplots(1, n_fb, figsize=(6 * n_fb, 4.5), squeeze=False)
-    fig3.suptitle('FinBERT — Confusion Matrix (Test Set)', fontsize=13, fontweight='bold')
-    for i, exp in enumerate(finbert_exps):
+    # 图3: FinBERT (最佳3个)
+    fig3, axes3 = plt.subplots(1, 3, figsize=(15, 4.5), squeeze=False)
+    fig3.suptitle('FinBERT — Confusion Matrix (Test Set, Best 3 by Val Accuracy)', fontsize=13, fontweight='bold')
+    for i, exp in enumerate(finbert_best3):
         ax = axes3[0, i]
         m = _build_matrix(exp['predictions']) if exp['predictions'] is not None else np.zeros((3,3))
         _draw_one_heatmap(ax, m, exp['name'], labels)

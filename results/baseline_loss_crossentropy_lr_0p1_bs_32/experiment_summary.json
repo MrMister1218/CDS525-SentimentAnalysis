@@ -6,9 +6,9 @@
   "epochs": 10,
   "best_val_acc": 0.5938,
   "test_acc": 0.5938,
-  "test_loss": 1.0822,
-  "train_final_loss": 2.1528,
-  "train_final_acc": 0.3854,
-  "val_final_loss": 1.0993,
+  "test_loss": 1.4748,
+  "train_final_loss": 2.1553,
+  "train_final_acc": 0.3991,
+  "val_final_loss": 1.4125,
   "val_final_acc": 0.5938
 }
